@@ -15,7 +15,7 @@ __all__ = ["vis"]
 def vis_train(inps, targets, cfg):
     for i in range(inps.shape[0]):
         image = inps[i].cpu().numpy().transpose(2, 1, 0).astype(np.uint8).copy()
-        target = targets[i].cpu().numpy().astype(np.int).copy()
+        target = targets[i].cpu().numpy().astype(int).copy()
         bbox = target[:, 1:]
         # bbox[:, 2] = bbox[:, 0] + bbox[:, 2]
         # bbox[:, 3] = bbox[:, 1] + bbox[:, 3]
