@@ -49,7 +49,7 @@ SOLVER = dict(
 
 DATASETS = dict(
     TRAIN=("tless_1_train_pbr",),
-    TRAIN2=("tless_1_train_primesense"),
+    TRAIN2=("tless_1_train_primesense",),
     TRAIN2_RATIO=0.3,
     TEST=("tless_bop_test_primesense",),
     # AP        AP50    AP75    AR      inf.time

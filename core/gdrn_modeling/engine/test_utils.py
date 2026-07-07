@@ -26,6 +26,14 @@ def _to_str(item):
         return "{}".format(item)
 
 
+def _normalize_error_types(error_types):
+    if isinstance(error_types, str):
+        error_types_list = [e for e in error_types.split(",") if e]
+    else:
+        error_types_list = list(error_types)
+    return ",".join(error_types_list), error_types_list
+
+
 def to_list(array):
     return array.flatten().tolist()
 
@@ -53,13 +61,14 @@ def save_and_eval_results(cfg, results_all, output_dir, obj_ids=None):
 
     if not cfg.VAL.SAVE_BOP_CSV_ONLY:
         result_names_str = ",".join(result_names)
+        error_types_str, error_types = _normalize_error_types(cfg.VAL.ERROR_TYPES)
         eval_cmd = [
             "python",
             cfg.VAL.SCRIPT_PATH,
             "--results_path={}".format(save_root),
             "--result_filenames={}".format(result_names_str),
             "--renderer_type={}".format(cfg.VAL.RENDERER_TYPE),
-            "--error_types={}".format(cfg.VAL.ERROR_TYPES),
+            "--error_types={}".format(error_types_str),
             "--eval_path={}".format(save_root),
             "--targets_filename={}".format(cfg.VAL.TARGETS_FILENAME),
             "--n_top={}".format(cfg.VAL.N_TOP),
@@ -74,7 +83,7 @@ def save_and_eval_results(cfg, results_all, output_dir, obj_ids=None):
             cfg,
             eval_root=save_root,
             result_names=result_names,
-            error_types=cfg.VAL.ERROR_TYPES.split(","),
+            error_types=error_types,
             obj_ids=obj_ids,
         )
         logger.info("eval time: {}s".format(time.perf_counter() - eval_time))
@@ -100,6 +109,7 @@ def eval_cached_results(cfg, output_dir, obj_ids=None):
                 res_path = osp.join(save_root, result_name)
         assert osp.exists(res_path), res_path
         result_names.append(result_name)
+    error_types_str, error_types = _normalize_error_types(cfg.VAL.ERROR_TYPES)
     try:
         if not cfg.VAL.EVAL_PRINT_ONLY:
             raise RuntimeError()
@@ -107,7 +117,7 @@ def eval_cached_results(cfg, output_dir, obj_ids=None):
             cfg,
             eval_root=save_root,
             result_names=result_names,
-            error_types=cfg.VAL.ERROR_TYPES.split(","),
+            error_types=error_types,
             obj_ids=obj_ids,
         )
     except:
@@ -118,7 +128,7 @@ def eval_cached_results(cfg, output_dir, obj_ids=None):
             "--results_path={}".format(save_root),
             "--result_filenames={}".format(result_names_str),
             "--renderer_type={}".format(cfg.VAL.RENDERER_TYPE),
-            "--error_types={}".format(cfg.VAL.ERROR_TYPES),
+            "--error_types={}".format(error_types_str),
             "--eval_path={}".format(save_root),
             "--targets_filename={}".format(cfg.VAL.TARGETS_FILENAME),
             "--n_top={}".format(cfg.VAL.N_TOP),
@@ -133,7 +143,7 @@ def eval_cached_results(cfg, output_dir, obj_ids=None):
             cfg,
             eval_root=save_root,
             result_names=result_names,
-            error_types=cfg.VAL.ERROR_TYPES.split(","),
+            error_types=error_types,
             obj_ids=obj_ids,
         )
         logger.info("eval time: {}s".format(time.perf_counter() - eval_time))
@@ -545,6 +555,7 @@ if __name__ == "__main__":
     if args.opts is not None:
         cfg.merge_from_dict(args.opts)
 
+    error_types_str, error_types = _normalize_error_types(cfg.VAL.ERROR_TYPES)
     eval_time = time.perf_counter()
     if not args.print_only:
         eval_cmd = [
@@ -554,7 +565,7 @@ if __name__ == "__main__":
             "--result_filenames={}".format(result_names_str),
             "--dataset={}".format(args.dataset),
             "--renderer_type={}".format(cfg.VAL.RENDERER_TYPE),
-            "--error_types={}".format(cfg.VAL.ERROR_TYPES),
+            "--error_types={}".format(error_types_str),
             "--eval_path={}".format(result_dir),
             "--targets_filename={}".format(cfg.VAL.TARGETS_FILENAME),
             "--n_top={}".format(cfg.VAL.N_TOP),
@@ -569,7 +580,7 @@ if __name__ == "__main__":
         cfg,
         eval_root=result_dir,
         result_names=result_names,
-        error_types=cfg.VAL.ERROR_TYPES.split(","),
+        error_types=error_types,
         obj_ids=obj_ids,
     )
     logger.info("eval time: {}s".format(time.perf_counter() - eval_time))
